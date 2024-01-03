@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { defaults } from 'underscore';
 
 import aggregate from './aggregate';

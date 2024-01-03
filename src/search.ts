@@ -23,6 +23,7 @@ import { decode, encode } from './utils/bsonUrlEncoding';
  *      the results.
  */
 export default async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collection: Collection | any,
   searchString: string,
   params: SearchParams
@@ -92,7 +93,7 @@ export default async (
     $limit: params.limit,
   });
 
-  let response: { results: any; next?: any };
+  let response: PaginationResponse;
 
   // Support both the native 'mongodb' driver and 'mongoist'. See:
   // https://www.npmjs.com/package/mongoist#cursor-operations
@@ -105,10 +106,12 @@ export default async (
     response = {
       results,
       next: encode([last(results).score, last(results)._id]),
+      totalCount: await collection.countDocuments(params.query),
     };
   } else {
     response = {
       results,
+      totalCount: await collection.countDocuments(params.query),
     };
   }
   return response;

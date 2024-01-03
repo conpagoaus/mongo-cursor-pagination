@@ -42,6 +42,7 @@ import { sanitizeMultiParamsMutate } from "./utils/sanitizeParams";
  * @param {object} params.collation An optional collation to provide to the mongo query. E.g. { locale: 'en', strength: 2 }. When null, disables the global collation.
  */
 export default async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collection: Collection | any,
   params: QueryParamsMulti
 ): Promise<PaginationResponse> => {
