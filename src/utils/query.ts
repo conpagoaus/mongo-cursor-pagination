@@ -285,9 +285,7 @@ export function generateCursorQueryMulti(params: QueryParamsMulti) {
         }
         return Object.assign(
           {},
-          ...Object.entries(prev).map(([k, v]) =>
-            convert$lt$gtFieldTo$eq({ [k]: v })
-          )
+          ...Object.entries(prev).map(([k, v]) => ({ [k]: v }))
         );
       })();
 
