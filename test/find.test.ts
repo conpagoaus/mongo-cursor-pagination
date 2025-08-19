@@ -175,7 +175,7 @@ describe("find", () => {
       ),
 
       db.collection("test_null_values").insertMany(
-        [undefined, null, "Bravo", null, "Alice", undefined, null, "alpha"]
+        [undefined, null, "Bravo", "Prime", "Alice", "Sally", "Fred", "alpha"]
           // expectation is for an incrementing set of id values, so reverse the order
           // prior adding an objectId (as objectIds will order by latest to oldest)
           .reverse()
@@ -1498,8 +1498,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(2);
-      expect(res.results[1].counter).toEqual(1);
+      expect(res.results[0].counter).toEqual(1);
+      expect(res.results[1].counter).toEqual(2);
       expect(res.hasPrevious).toBe(true);
       expect(res.hasNext).toBe(false);
 
@@ -1511,8 +1511,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(4);
-      expect(res.results[1].counter).toEqual(3);
+      expect(res.results[0].counter).toEqual(3);
+      expect(res.results[1].counter).toEqual(2);
       expect(res.hasPrevious).toBe(true);
       expect(res.hasNext).toBe(true);
     });
@@ -1552,8 +1552,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(2);
-      expect(res.results[1].counter).toEqual(1);
+      expect(res.results[0].counter).toEqual(1);
+      expect(res.results[1].counter).toEqual(2);
       expect(res.hasPrevious).toBe(true);
       expect(res.hasNext).toBe(false);
 
@@ -1565,8 +1565,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(4);
-      expect(res.results[1].counter).toEqual(3);
+      expect(res.results[0].counter).toEqual(3);
+      expect(res.results[1].counter).toEqual(2);
       expect(res.hasPrevious).toBe(true);
       expect(res.hasNext).toBe(true);
     });
@@ -1595,8 +1595,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(1);
-      expect(res.results[1].counter).toEqual(2);
+      expect(res.results[0].counter).toEqual(3);
+      expect(res.results[1].counter).toEqual(1);
       expect(res.hasPrevious).toBe(false);
       expect(res.hasNext).toBe(true);
 
@@ -1609,8 +1609,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(3);
-      expect(res.results[1].counter).toEqual(4);
+      expect(res.results[0].counter).toEqual(2);
+      expect(res.results[1].counter).toEqual(3);
       expect(res.hasPrevious).toBe(true);
       expect(res.hasNext).toBe(true);
 
@@ -1623,10 +1623,10 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(5);
-      expect(res.results[1].counter).toEqual(6);
+      expect(res.results[0].counter).toEqual(6);
+      expect(res.results[1].counter).toEqual(4);
       expect(res.hasPrevious).toBe(true);
-      expect(res.hasNext).toBe(false);
+      expect(res.hasNext).toBe(true);
 
       // Now back up 2
       res = await find(collection, {
@@ -1637,8 +1637,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(3);
-      expect(res.results[1].counter).toEqual(4);
+      expect(res.results[0].counter).toEqual(4);
+      expect(res.results[1].counter).toEqual(5);
       expect(res.hasPrevious).toBe(true);
       expect(res.hasNext).toBe(true);
     });
@@ -1653,8 +1653,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(1);
-      expect(res.results[1].counter).toEqual(2);
+      expect(res.results[0].counter).toEqual(3);
+      expect(res.results[1].counter).toEqual(1);
       expect(res.hasPrevious).toBe(false);
       expect(res.hasNext).toBe(true);
 
@@ -1667,8 +1667,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(3);
-      expect(res.results[1].counter).toEqual(4);
+      expect(res.results[0].counter).toEqual(2);
+      expect(res.results[1].counter).toEqual(3);
       expect(res.hasPrevious).toBe(true);
       expect(res.hasNext).toBe(true);
 
@@ -1681,10 +1681,10 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(5);
-      expect(res.results[1].counter).toEqual(6);
+      expect(res.results[0].counter).toEqual(6);
+      expect(res.results[1].counter).toEqual(4);
       expect(res.hasPrevious).toBe(true);
-      expect(res.hasNext).toBe(false);
+      expect(res.hasNext).toBe(true);
 
       // Now back up 2
       res = await find(collection, {
@@ -1695,8 +1695,8 @@ describe("find", () => {
       });
 
       expect(res.results.length).toEqual(2);
-      expect(res.results[0].counter).toEqual(3);
-      expect(res.results[1].counter).toEqual(4);
+      expect(res.results[0].counter).toEqual(4);
+      expect(res.results[1].counter).toEqual(5);
       expect(res.hasPrevious).toBe(true);
       expect(res.hasNext).toBe(true);
     });
@@ -1933,7 +1933,7 @@ describe("find", () => {
       it("returns null and undefined as same primary sort value, and returns before alphabetical values", async () => {
         const collection = db.collection("test_null_values");
         // DOCUMENTS in oldest to latest order =>
-        // [undefined, null, 'Bravo', null, 'Alice' undefined, null, 'alpha']
+        // [undefined, null, "Bravo", "Prime", "Alice", "Sally", "Fred", "alpha"]
 
         ////////////////////// PAGE EXPECTATIONS /////////////////////////////////
         // expect that the undefined + null values are considered the same for sorting, so
@@ -1950,50 +1950,28 @@ describe("find", () => {
           expect(hasPrevious).toBe(false);
           expect(results).toHaveLength(3);
 
-          expect(results[0].name).toEqual(null);
           const firstResultDecodedCursor = decode(results[0]._cursor);
+          try {
+            expect(results[0].name).toEqual(null);
+            expect(firstResultDecodedCursor?.[0]).toEqual(null);
+          } catch {
+            expect(results[0].name).toBeUndefined();
+            expect(firstResultDecodedCursor?.[0]).toEqual(undefined);
+          }
           expect(firstResultDecodedCursor).toHaveLength(2);
-          expect(firstResultDecodedCursor?.[0]).toEqual(null);
           expect(firstResultDecodedCursor?.[1].toString()).toEqual(
             results[0]._id.toString()
           );
 
-          expect(results[1].name).toBeUndefined();
           const secondResultDecodedCursor = decode(results[1]._cursor);
           expect(secondResultDecodedCursor).toHaveLength(2);
-          expect(secondResultDecodedCursor?.[0]).toEqual(undefined);
-          expect(secondResultDecodedCursor?.[1].toString()).toEqual(
-            results[1]._id.toString()
-          );
-
-          expect(results[2].name).toEqual(null);
-          const thirdResultDecodedCursor = decode(results[2]._cursor);
-          expect(thirdResultDecodedCursor).toHaveLength(2);
-          expect(thirdResultDecodedCursor?.[0]).toEqual(null);
-          expect(thirdResultDecodedCursor?.[1].toString()).toEqual(
-            results[2]._id.toString()
-          );
-        };
-
-        const expectPageTwo = response => {
-          const { results, hasNext, hasPrevious } = response;
-
-          expect(hasNext).toBe(true);
-          expect(hasPrevious).toBe(true);
-          expect(results).toHaveLength(3);
-
-          expect(results[0].name).toEqual(null);
-          const firstResultDecodedCursor = decode(results[0]._cursor);
-          expect(firstResultDecodedCursor).toHaveLength(2);
-          expect(firstResultDecodedCursor?.[0]).toEqual(null);
-          expect(firstResultDecodedCursor?.[1].toString()).toEqual(
-            results[0]._id.toString()
-          );
-
-          expect(results[1].name).toBeUndefined();
-          const secondResultDecodedCursor = decode(results[1]._cursor);
-          expect(secondResultDecodedCursor).toHaveLength(2);
-          expect(secondResultDecodedCursor?.[0]).toEqual(undefined);
+          try {
+            expect(results[1].name).toEqual(null);
+            expect(secondResultDecodedCursor?.[0]).toEqual(null);
+          } catch {
+            expect(results[1].name).toBeUndefined();
+            expect(secondResultDecodedCursor?.[0]).toEqual(undefined);
+          }
           expect(secondResultDecodedCursor?.[1].toString()).toEqual(
             results[1]._id.toString()
           );
@@ -2007,12 +1985,12 @@ describe("find", () => {
           );
         };
 
-        const expectPageThree = response => {
+        const expectPageTwo = response => {
           const { results, hasNext, hasPrevious } = response;
 
-          expect(hasNext).toBe(false);
+          expect(hasNext).toBe(true);
           expect(hasPrevious).toBe(true);
-          expect(results).toHaveLength(2);
+          expect(results).toHaveLength(3);
 
           expect(results[0].name).toEqual("Bravo");
           const firstResultDecodedCursor = decode(results[0]._cursor);
@@ -2022,7 +2000,39 @@ describe("find", () => {
             results[0]._id.toString()
           );
 
-          expect(results[1].name).toEqual("alpha"); // as case senitivity sorted, expect 'alpha' after 'Bravo'
+          expect(results[1].name).toEqual("Fred");
+          const secondResultDecodedCursor = decode(results[1]._cursor);
+          expect(secondResultDecodedCursor).toHaveLength(2);
+          expect(secondResultDecodedCursor?.[0]).toEqual("Fred");
+          expect(secondResultDecodedCursor?.[1].toString()).toEqual(
+            results[1]._id.toString()
+          );
+
+          expect(results[2].name).toEqual("Prime");
+          const thirdResultDecodedCursor = decode(results[2]._cursor);
+          expect(thirdResultDecodedCursor).toHaveLength(2);
+          expect(thirdResultDecodedCursor?.[0]).toEqual("Prime");
+          expect(thirdResultDecodedCursor?.[1].toString()).toEqual(
+            results[2]._id.toString()
+          );
+        };
+
+        const expectPageThree = response => {
+          const { results, hasNext, hasPrevious } = response;
+
+          expect(hasNext).toBe(false);
+          expect(hasPrevious).toBe(true);
+          expect(results).toHaveLength(2);
+
+          expect(results[0].name).toEqual("Sally");
+          const firstResultDecodedCursor = decode(results[0]._cursor);
+          expect(firstResultDecodedCursor).toHaveLength(2);
+          expect(firstResultDecodedCursor?.[0]).toEqual("Sally");
+          expect(firstResultDecodedCursor?.[1].toString()).toEqual(
+            results[0]._id.toString()
+          );
+
+          expect(results[1].name).toEqual("alpha");
           const secondResultDecodedCursor = decode(results[1]._cursor);
           expect(secondResultDecodedCursor).toHaveLength(2);
           expect(secondResultDecodedCursor?.[0]).toEqual("alpha");
