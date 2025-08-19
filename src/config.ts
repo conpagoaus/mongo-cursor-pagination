@@ -4,7 +4,7 @@ export default {
   /**
    * {Number} The maximum limit (page size).
    */
-  MAX_LIMIT: 300,
+  MAX_LIMIT: 700,
 
   /**
    * {Number} The default limit (page size), if none is specified.
