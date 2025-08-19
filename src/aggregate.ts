@@ -72,7 +72,7 @@ export default async (
     // and add to cursors, but return the original paginated field value to client.
     const addLowerCaseFieldSearch = {
       $addFields: {
-        __lower_case_value: {
+        [`__lower_case_value_${paginatedField}`]: {
           $switch: {
             branches: [
               {

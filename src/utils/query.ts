@@ -184,7 +184,7 @@ export function generateCursorQuery(
     return { _id: sortAsc ? { $gt: cursor } : { $lt: cursor } };
 
   const field = params.sortCaseInsensitive
-    ? "__lower_case_value" // lc value of the paginatedField (via $addFields + $toLower)
+    ? `__lower_case_value_${params.paginatedField}` // lc value of the paginatedField (via $addFields + $toLower)
     : params.paginatedField;
 
   const notNullNorUndefined = { [field]: { $ne: null } };
@@ -351,7 +351,7 @@ function convert$lt$gtFieldTo$eq(
   field: Record<string, Record<"$lt" | "$gt", any>>
 ): Record<string, Record<"$eq", any>> {
   const [key, value] = Object.entries(field)[0];
-  const fieldValue = value ? Object.values(value)[0]: ''; 
+  const fieldValue = value ? Object.values(value)[0] : "";
   return { [key]: { $eq: fieldValue } };
 }
 
