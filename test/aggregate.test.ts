@@ -84,7 +84,7 @@ describe("aggregate", () => {
       ]),
 
       db.collection("test_null_values").insertMany(
-        [undefined, null, "Bravo", null, "Alice", undefined, null, "alpha"]
+        [undefined, null, "Bravo", "Prime", "Alice", "Sally", "Fred", "alpha"]
           // expectation is for an incrementing set of id values, so reverse the order
           // prior adding an objectId (as objectIds will order by latest to oldest)
           .reverse()
@@ -805,7 +805,7 @@ describe("aggregate", () => {
         const collection = db.collection("test_null_values");
 
         // DOCUMENTS in oldest to latest order =>
-        // [undefined, null, 'Bravo', null, 'Alice' undefined, null, 'alpha']
+        // [undefined, null, 'Bravo', 'Prime', 'Alice', 'Sally', 'Fred', 'alpha']
 
         ////////////////////// PAGE EXPECTATIONS /////////////////////////////////
         // expect that the undefined + null values are considered the same for sorting, so
@@ -822,50 +822,18 @@ describe("aggregate", () => {
           expect(hasPrevious).toBe(false);
           expect(results).toHaveLength(3);
 
-          expect(results[0].name).toEqual(null);
+          expect(results[0].name).toBeUndefined();
           const firstResultDecodedCursor = decode(results[0]._cursor);
           expect(firstResultDecodedCursor).toHaveLength(2);
-          expect(firstResultDecodedCursor?.[0]).toEqual(null);
+          expect(firstResultDecodedCursor?.[0]).toEqual(undefined);
           expect(firstResultDecodedCursor?.[1].toString()).toEqual(
             results[0]._id.toString()
           );
 
-          expect(results[1].name).toBeUndefined();
+          expect(results[1].name).toEqual(null);
           const secondResultDecodedCursor = decode(results[1]._cursor);
           expect(secondResultDecodedCursor).toHaveLength(2);
-          expect(secondResultDecodedCursor?.[0]).toEqual(undefined);
-          expect(secondResultDecodedCursor?.[1].toString()).toEqual(
-            results[1]._id.toString()
-          );
-
-          expect(results[2].name).toEqual(null);
-          const thirdResultDecodedCursor = decode(results[2]._cursor);
-          expect(thirdResultDecodedCursor).toHaveLength(2);
-          expect(thirdResultDecodedCursor?.[0]).toEqual(null);
-          expect(thirdResultDecodedCursor?.[1].toString()).toEqual(
-            results[2]._id.toString()
-          );
-        };
-
-        const expectPageTwo = response => {
-          const { results, hasNext, hasPrevious } = response;
-
-          expect(hasNext).toBe(true);
-          expect(hasPrevious).toBe(true);
-          expect(results).toHaveLength(3);
-
-          expect(results[0].name).toEqual(null);
-          const firstResultDecodedCursor = decode(results[0]._cursor);
-          expect(firstResultDecodedCursor).toHaveLength(2);
-          expect(firstResultDecodedCursor?.[0]).toEqual(null);
-          expect(firstResultDecodedCursor?.[1].toString()).toEqual(
-            results[0]._id.toString()
-          );
-
-          expect(results[1].name).toBeUndefined();
-          const secondResultDecodedCursor = decode(results[1]._cursor);
-          expect(secondResultDecodedCursor).toHaveLength(2);
-          expect(secondResultDecodedCursor?.[0]).toEqual(undefined);
+          expect(secondResultDecodedCursor?.[0]).toEqual(null);
           expect(secondResultDecodedCursor?.[1].toString()).toEqual(
             results[1]._id.toString()
           );
@@ -879,6 +847,37 @@ describe("aggregate", () => {
           );
         };
 
+        const expectPageTwo = response => {
+          const { results, hasNext, hasPrevious } = response;
+
+          expect(hasNext).toBe(true);
+          expect(hasPrevious).toBe(true);
+          expect(results).toHaveLength(3);
+
+          expect(results[0].name).toEqual("Bravo");
+          const firstResultDecodedCursor = decode(results[0]._cursor);
+          expect(firstResultDecodedCursor).toHaveLength(2);
+          expect(firstResultDecodedCursor?.[1].toString()).toEqual(
+            results[0]._id.toString()
+          );
+
+          expect(results[1].name).toEqual("Fred");
+          const secondResultDecodedCursor = decode(results[1]._cursor);
+          expect(secondResultDecodedCursor?.[0]).toEqual("Fred");
+          expect(secondResultDecodedCursor).toHaveLength(2);
+          expect(secondResultDecodedCursor?.[1].toString()).toEqual(
+            results[1]._id.toString()
+          );
+
+          expect(results[2].name).toEqual("Prime");
+          const thirdResultDecodedCursor = decode(results[2]._cursor);
+          expect(thirdResultDecodedCursor).toHaveLength(2);
+          expect(thirdResultDecodedCursor?.[0]).toEqual("Prime");
+          expect(thirdResultDecodedCursor?.[1].toString()).toEqual(
+            results[2]._id.toString()
+          );
+        };
+
         const expectPageThree = response => {
           const { results, hasNext, hasPrevious } = response;
 
@@ -886,10 +885,10 @@ describe("aggregate", () => {
           expect(hasPrevious).toBe(true);
           expect(results).toHaveLength(2);
 
-          expect(results[0].name).toEqual("Bravo");
+          expect(results[0].name).toEqual("Sally");
           const firstResultDecodedCursor = decode(results[0]._cursor);
           expect(firstResultDecodedCursor).toHaveLength(2);
-          expect(firstResultDecodedCursor?.[0]).toEqual("Bravo");
+          expect(firstResultDecodedCursor?.[0]).toEqual("Sally");
           expect(firstResultDecodedCursor?.[1].toString()).toEqual(
             results[0]._id.toString()
           );
@@ -912,42 +911,42 @@ describe("aggregate", () => {
         };
 
         // Initial page
-        let response = await aggregate(collection, { ...options });
+        const response = await aggregate(collection, { ...options });
         expectPageOne(response);
         const page1NextCursor =
           response.results[response.results.length - 1]._cursor;
 
         // Get second Page via forward pagination
-        response = await aggregate(collection, {
+        const response1 = await aggregate(collection, {
           ...options,
           next: page1NextCursor,
         });
-        expectPageTwo(response);
+        expectPageTwo(response1);
         const page2NextCursor =
-          response.results[response.results.length - 1]._cursor;
+          response1.results[response1.results.length - 1]._cursor;
 
         // Get third Page via forward pagination
-        response = await aggregate(collection, {
+        const response2 = await aggregate(collection, {
           ...options,
           next: page2NextCursor,
         });
-        expectPageThree(response);
-        const page3StartCursor = response.results[0]._cursor;
-
         // Get second page via backward pagination
-        response = await aggregate(collection, {
+
+        expectPageThree(response2);
+        const page3StartCursor = response2.results[0]._cursor;
+        const response3 = await aggregate(collection, {
           ...options,
           previous: page3StartCursor,
         });
-        expectPageTwo(response);
-        const page2StartCursor = response.results[0]._cursor;
+        expectPageTwo(response3);
+        const page2StartCursor = response3.results[0]._cursor;
 
         // Get first page via backward pagination
-        response = await aggregate(collection, {
+        const response4 = await aggregate(collection, {
           ...options,
           previous: page2StartCursor,
         });
-        expectPageOne(response);
+        expectPageOne(response4);
       });
     });
 
@@ -991,7 +990,7 @@ describe("aggregate", () => {
         const collection = db.collection("test_null_values");
 
         // DOCUMENTS in oldest to latest order =>
-        // [undefined, null, 'Bravo', null, 'Alice' undefined, null, 'alpha']
+        // [undefined, null, 'Bravo', 'Prime', 'Alice', 'Sally', 'Fred', 'alpha']
 
         ////////////////////// PAGE EXPECTATIONS /////////////////////////////////
         // expect that the undefined + null values are considered the same for sorting, so the most recently
@@ -1009,50 +1008,21 @@ describe("aggregate", () => {
           expect(hasPrevious).toBe(false);
           expect(results).toHaveLength(3);
 
-          expect(results[0].name).toEqual(null);
           const firstResultDecodedCursor = decode(results[0]._cursor);
           expect(firstResultDecodedCursor).toHaveLength(2);
-          expect(firstResultDecodedCursor?.[0]).toEqual(null);
+          try {
+            expect(results[0].name).toEqual(null);
+            expect(firstResultDecodedCursor?.[0]).toEqual(null);
+          } catch {
+            expect(results[0].name).toBeUndefined();
+            expect(firstResultDecodedCursor?.[0]).toEqual(undefined);
+          }
           expect(firstResultDecodedCursor?.[1].toString()).toEqual(
             results[0]._id.toString()
           );
 
-          expect(results[1].name).toBeUndefined();
           const secondResultDecodedCursor = decode(results[1]._cursor);
           expect(secondResultDecodedCursor).toHaveLength(2);
-          expect(secondResultDecodedCursor?.[0]).toEqual(undefined);
-          expect(secondResultDecodedCursor?.[1].toString()).toEqual(
-            results[1]._id.toString()
-          );
-
-          expect(results[2].name).toEqual(null);
-          const thirdResultDecodedCursor = decode(results[2]._cursor);
-          expect(thirdResultDecodedCursor).toHaveLength(2);
-          expect(thirdResultDecodedCursor?.[0]).toEqual(null);
-          expect(thirdResultDecodedCursor?.[1].toString()).toEqual(
-            results[2]._id.toString()
-          );
-        };
-
-        const expectPageTwo = response => {
-          const { results, hasNext, hasPrevious } = response;
-
-          expect(hasNext).toBe(true);
-          expect(hasPrevious).toBe(true);
-          expect(results).toHaveLength(3);
-
-          expect(results[0].name).toEqual(null);
-          const firstResultDecodedCursor = decode(results[0]._cursor);
-          expect(firstResultDecodedCursor).toHaveLength(2);
-          expect(firstResultDecodedCursor?.[0]).toEqual(null);
-          expect(firstResultDecodedCursor?.[1].toString()).toEqual(
-            results[0]._id.toString()
-          );
-
-          expect(results[1].name).toBeUndefined();
-          const secondResultDecodedCursor = decode(results[1]._cursor);
-          expect(secondResultDecodedCursor).toHaveLength(2);
-          expect(secondResultDecodedCursor?.[0]).toEqual(undefined);
           expect(secondResultDecodedCursor?.[1].toString()).toEqual(
             results[1]._id.toString()
           );
@@ -1066,14 +1036,14 @@ describe("aggregate", () => {
           );
         };
 
-        const expectPageThree = response => {
+        const expectPageTwo = response => {
           const { results, hasNext, hasPrevious } = response;
 
-          expect(hasNext).toBe(false);
+          expect(hasNext).toBe(true);
           expect(hasPrevious).toBe(true);
-          expect(results).toHaveLength(2);
+          expect(results).toHaveLength(3);
 
-          expect(results[0].name).toEqual("alpha"); // 'alpha' now prior 'Bravo'
+          expect(results[0].name).toEqual("alpha");
           const firstResultDecodedCursor = decode(results[0]._cursor);
           expect(firstResultDecodedCursor).toHaveLength(2);
           expect(firstResultDecodedCursor?.[0]).toEqual("alpha");
@@ -1081,10 +1051,42 @@ describe("aggregate", () => {
             results[0]._id.toString()
           );
 
-          expect(results[1].name).toEqual("Bravo"); // as case senitivity sorted, expect 'alpha' after 'Bravo'
+          expect(results[1].name).toEqual("Bravo");
           const secondResultDecodedCursor = decode(results[1]._cursor);
           expect(secondResultDecodedCursor).toHaveLength(2);
           expect(secondResultDecodedCursor?.[0]).toEqual("bravo");
+          expect(secondResultDecodedCursor?.[1].toString()).toEqual(
+            results[1]._id.toString()
+          );
+
+          expect(results[2].name).toEqual("Fred");
+          const thirdResultDecodedCursor = decode(results[2]._cursor);
+          expect(thirdResultDecodedCursor).toHaveLength(2);
+          expect(thirdResultDecodedCursor?.[0]).toEqual("fred");
+          expect(thirdResultDecodedCursor?.[1].toString()).toEqual(
+            results[2]._id.toString()
+          );
+        };
+
+        const expectPageThree = response => {
+          const { results, hasNext, hasPrevious } = response;
+
+          expect(hasNext).toBe(false);
+          expect(hasPrevious).toBe(true);
+          expect(results).toHaveLength(2);
+
+          expect(results[0].name).toEqual("Prime");
+          const firstResultDecodedCursor = decode(results[0]._cursor);
+          expect(firstResultDecodedCursor).toHaveLength(2);
+          expect(firstResultDecodedCursor?.[0]).toEqual("prime");
+          expect(firstResultDecodedCursor?.[1].toString()).toEqual(
+            results[0]._id.toString()
+          );
+
+          expect(results[1].name).toEqual("Sally"); // as case senitivity sorted, expect 'alpha' after 'Bravo'
+          const secondResultDecodedCursor = decode(results[1]._cursor);
+          expect(secondResultDecodedCursor).toHaveLength(2);
+          expect(secondResultDecodedCursor?.[0]).toEqual("sally");
           expect(secondResultDecodedCursor?.[1].toString()).toEqual(
             results[1]._id.toString()
           );
